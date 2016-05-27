@@ -443,10 +443,10 @@ void GameState::GenerateChildren()
 		child->GenerateChildren();
 		AddChildren( child );
 
-		//if( child->isAlreadyMinMax() )
-		//{
-		//	break;
-		//}
+		if( child->isAlreadyMinMax() )
+		{
+			break;
+		}
 	}
 
 	// 遍历所有孩子，获得当前是最大还是最小值
