@@ -58,6 +58,8 @@ struct OneShot
 		}
 		std::cout<<std::endl;
 	}
+	
+	bool CalSelfType();
 };
 
 class Player
@@ -83,6 +85,23 @@ public:
 		return res;
 	}
 
+	bool isValidShot( OneShot shot ) const {
+		Player res( *this );
+		for( auto it = shot.vec_card.begin(); it != shot.vec_card.end(); ++it )
+		{
+			auto find_it = std::find( res.m_vec_card.begin(), res.m_vec_card.end(), *it );
+			if( find_it != res.m_vec_card.end() )
+			{
+				res.m_vec_card.erase( find_it );
+			}
+			else
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	void Print(){
 		for( auto it = m_vec_card.begin(); it != m_vec_card.end(); ++it )
 		{
@@ -96,8 +115,25 @@ public:
 class GameState : public MinMaxTreeNodeBase
 {
 public:
+	GameState(){};
+	GameState( std::vector<Card> pGS1, std::vector<Card> pGS2, bool isp11Turn )
+	{
+		int i = -1;
+		while( ++i != pGS1.size() )
+		{
+			Ygritte.m_vec_card.push_back( pGS1[i] );
+		}
+
+		i = -1;
+		while( ++i != pGS2.size() )
+		{
+			JonSnow.m_vec_card.push_back( pGS2[i] );
+		}
+		isYgrittesPlaying = isp11Turn;
+	}
 	virtual void GenerateChildren();
 	virtual void Print();
+	OneShot DecideAndMove();
 
 	GameState* GetNewChild( OneShot shot, bool isYgrittesPlaying );
 	bool CheckGameEnd();
@@ -113,22 +149,9 @@ class GameStateTree : public DecidingTree< GameState >
 public:
 	GameStateTree( std::vector<Card> pGS1, std::vector<Card> pGS2, bool isp11Turn )
 	{
-		m_root = new GameState();
-
-		int i = -1;
-		while( ++i != pGS1.size() )
-		{
-			m_root->Ygritte.m_vec_card.push_back( pGS1[i] );
-		}
-
-		i = -1;
-		while( ++i != pGS2.size() )
-		{
-			m_root->JonSnow.m_vec_card.push_back( pGS2[i] );
-		}
-
-		m_root->isYgrittesPlaying = isp11Turn;
+		m_root = new GameState( pGS1, pGS2, isp11Turn );
 	}
 	~GameStateTree(){};
 };
+
 #endif 

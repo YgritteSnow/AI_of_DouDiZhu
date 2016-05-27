@@ -1,23 +1,94 @@
-#include "gamestate.h"
+#include "game.h"
 #include <iostream>
+#include <sstream>
 
-int main()
+void Game::Start()
 {
-	std::vector< Card > ygritte;
-	ygritte.push_back( Card( 9, Card::SuitType_clubs ) );
-	ygritte.push_back( Card( 9, Card::SuitType_clubs ) );
+	std::cout<<" --- 游戏开始 ---"<<std::endl;
+	m_ai_givein = false;
+}
 
-	std::vector< Card > snow;
-	snow.push_back( Card( 6, Card::SuitType_clubs ) );
-	snow.push_back( Card( 6, Card::SuitType_clubs ) );
-	snow.push_back( Card( 7, Card::SuitType_clubs ) );
-	snow.push_back( Card( 7, Card::SuitType_clubs ) );
+void Game::NextMove()
+{
+	if( m_cur_game->isYgrittesPlaying )
+	{
+		AIMove();
+	}
+	else
+	{
+		PlayerMove();
+	}
+}
 
-	GameStateTree gametree(ygritte, snow, true);
+bool Game::HasEnd()
+{
+	return m_ai_givein || m_cur_game->CheckGameEnd();
+}
 
-	gametree.StartGenerate();
-	gametree.Print();
+void Game::AIMove()
+{
+	std::cout<<" --- AI 思考中 --- "<<std::endl;
+	m_last_shot = m_cur_game->DecideAndMove();
+	if( m_last_shot.vec_card.empty() )
+	{
+		m_ai_givein = true;
+		std::cout<<" AI 没有必胜把握！投降了！"<<std::endl;
+	}
+	else
+	{
+		std::cout<<"AI 出牌："<<std::endl;
+		m_last_shot.Print();
+		std::cout<<"当前牌局："<<std::endl;
+		m_cur_game->Print();
+	}
+	std::cout<<" --- AI 完成 --- "<<std::endl;
+}
 
-	int a;
-	std::cin>>a;
+void Game::PlayerMove()
+{
+	std::cout<<" --- 玩家回合开始 --- "<<std::endl;
+	while( true )
+	{
+		std::cout<<"输入你要出的牌，空格键隔开，回车键确认："<<std::endl;
+		m_last_shot.vec_card.clear();
+
+		std::string playerStr;
+		getline( std::cin, playerStr );
+
+		std::stringstream strStream(playerStr);
+		int c;
+		while( strStream>> c )
+		{
+			m_last_shot.vec_card.push_back( Card( c, Card::SuitType_clubs ) );
+		}
+		if( m_last_shot.CalSelfType() )
+		{
+			if( m_cur_game->JonSnow.isValidShot( m_last_shot ) )
+			{
+				break;
+			}
+		}
+	}
+
+	std::cout<<" --- 玩家回合结束 --- "<<std::endl;
+}
+
+void Game::PrintResult()
+{
+	std::cout<<" --- 游戏结束 --- "<<std::endl;
+	if( m_ai_givein )
+	{
+		std::cout<<"AI认输"<<std::endl;
+	}
+	else
+	{
+		if( m_cur_game->m_curIsMax )
+		{
+			std::cout<<"AI赢了"<<std::endl;
+		}
+		else
+		{
+			std::cout<<"你赢了"<<std::endl;
+		}
+	}
 }

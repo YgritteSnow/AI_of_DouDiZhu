@@ -1,5 +1,82 @@
 #include "gamestate.h"
 #include <iostream>
+#include <map>
+
+bool OneShot::CalSelfType() // 这个函数写的实在是简单粗暴。。。。。
+{
+	if( vec_card.empty() )
+	{
+		return false;
+	}
+	else if( vec_card.size() == 1 )
+	{
+		shottype = ShotType_single;
+		return true;
+	}
+	else if( vec_card.size() == 2 )
+	{
+		if( vec_card[1] == vec_card[0] )
+		{
+			shottype = ShotType_double;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else if( vec_card.size() == 3 )
+	{
+		if( vec_card[0] == vec_card[1] && vec_card[1] == vec_card[2] )
+		{
+			shottype = ShotType_three;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else if( vec_card.size() == 4 )
+	{
+		if( vec_card[0] == vec_card[1] && vec_card[1] == vec_card[2] && vec_card[2] == vec_card[3] && vec_card[3] == vec_card[4] )
+		{
+			shottype = ShotType_four;
+			return true;
+		}
+		else
+		{
+			std::map< int, int > cardCount;
+			for( auto it = vec_card.begin(); it != vec_card.end(); ++it )
+			{
+				if( cardCount.find( it->num ) == cardCount.end() )
+				{
+					cardCount[it->num] = 1;
+				}
+				else
+				{
+					++ cardCount[it->num];
+				}
+			}
+
+			vec_card.clear();
+			if( cardCount.size() == 2 )
+			{
+				auto it_1 = cardCount.begin()->first;
+				auto it_2 = (++cardCount.begin())->first;
+				if( cardCount.begin()->second == 1 )
+				{
+					vec_card.push_back( Card(it_2, Card::SuitType_clubs ) );
+					vec_card.push_back( Card(it_2, Card::SuitType_clubs ) );
+					vec_card.push_back( Card(it_2, Card::SuitType_clubs ) );
+					vec_card.push_back( Card(it_1, Card::SuitType_clubs ) );
+				}
+			}
+			shottype = ShotType_three_and_one;
+			return true;
+		}
+	}
+}
 
 std::vector< OneShot > Player::GenerateShot_all_shift()
 {
@@ -307,6 +384,19 @@ std::vector< OneShot > Player::GenerateShot_one_space_byType( OneShot::ShotType 
 	return vec_res;
 }
 
+OneShot GameState::DecideAndMove()
+{
+	GenerateChildren();
+	for( auto it = m_vec_children.begin(); it != m_vec_children.end(); ++it )
+	{
+		if( (*it)->isUseful() )
+		{
+			return (dynamic_cast<GameState*>(*it))->lastShot;
+		}
+	}
+	return OneShot();
+}
+
 void GameState::GenerateChildren()
 {
 	// 检查是否有人已经出完牌了
@@ -352,10 +442,11 @@ void GameState::GenerateChildren()
 		GameState* child = GetNewChild( *it_shot, nextIsYgritte );
 		child->GenerateChildren();
 		AddChildren( child );
-		if( child->isAlreadyMinMax() )
-		{
-			break;
-		}
+
+		//if( child->isAlreadyMinMax() )
+		//{
+		//	break;
+		//}
 	}
 
 	// 遍历所有孩子，获得当前是最大还是最小值
@@ -380,7 +471,7 @@ void GameState::GenerateChildren()
 
 GameState* GameState::GetNewChild( OneShot shot, bool isYgrittesPlaying )
 {
-	GameState* child = new GameState;
+	GameState* child = new GameState();
 	if( isYgrittesPlaying )
 	{
 		child->Ygritte = Ygritte - shot;
