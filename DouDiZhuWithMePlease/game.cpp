@@ -4,7 +4,7 @@
 
 void Game::Start()
 {
-	GAME_MSG_1("游戏开始");
+	GAME_MSG_SYS("游戏开始");
 	m_ai_givein = false;
 	PrintCurrentState();
 }
@@ -30,7 +30,7 @@ bool Game::HasEnd()
 
 OneShot Game::AIMove()
 {
-	GAME_MSG_1("AI 思考中");
+	GAME_MSG_SYS("AI 思考中");
 	OneShot shot;
 	if( !m_cur_game->ThinkForNextMove( shot ) )
 	{
@@ -41,10 +41,10 @@ OneShot Game::AIMove()
 
 OneShot Game::PlayerMove()
 {
-	GAME_MSG_1("玩家选择出牌");
+	GAME_MSG_SYS("玩家选择出牌");
 	while( true )
 	{
-		std::cout<<"输入你要出的牌，0表示不出)。空格键隔开，回车键确认："<<std::endl;
+		GAME_MSG_INFO_ENDL("输入你要出的牌，0表示不出)。空格键隔开，回车键确认：");
 		m_last_shot.vec_card.clear();
 
 		std::string playerStr;
@@ -64,21 +64,21 @@ OneShot Game::PlayerMove()
 
 		if( !m_last_shot.CalSelfType() )
 		{
-			GAME_MSG_2("错误的组合！");
+			GAME_MSG_INFO_ENDL("错误的组合！");
 		}
 		else if( !m_cur_game->JonSnow.isValidShot( m_last_shot ) )
 		{
-			GAME_MSG_2("没有这张牌！");
+			GAME_MSG_INFO_ENDL("没有这张牌！");
 		}
 		else if( !m_last_shot.IsHigher(m_cur_game->lastShot) )
 		{
-			GAME_MSG_2("不能压过对方！");
+			GAME_MSG_INFO_ENDL("不能压过对方！");
 		}
 		else
 		{
 			return m_last_shot;
 		}
-		std::cout<<"出牌错误，请重试"<<std::endl;
+		GAME_MSG_INFO_ENDL("出牌错误，请重试");
 	}
 	return OneShot();
 }
@@ -90,23 +90,23 @@ void Game::PrintCurrentState()
 
 void Game::PrintResult()
 {
-	GAME_MSG_1("游戏结束");
+	GAME_MSG_SYS("游戏结束");
 	
 	PrintCurrentState();
 
 	if( m_ai_givein )
 	{
-		GAME_MSG_1("AI认输");
+		GAME_MSG_SYS("AI认输");
 	}
 	else
 	{
 		if( m_cur_game->m_curIsMax )
 		{
-			GAME_MSG_1("AI赢了");
+			GAME_MSG_SYS("AI赢了");
 		}
 		else
 		{
-			GAME_MSG_1("你赢了");
+			GAME_MSG_SYS("你赢了");
 		}
 	}
 }

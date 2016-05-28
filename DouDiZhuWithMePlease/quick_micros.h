@@ -3,8 +3,12 @@
 
 #include <iostream>
 
-#define GAME_MSG_1( x ) std::cout<<" === "<<(x)<<" === "<<std::endl
-#define GAME_MSG_2( x ) std::cout<<" --- "<<(x)<<" --- "<<std::endl
+#define GAME_MSG_DEFAULT( x ) std::cout<<x;
+#define GAME_MSG_SYS( x ) std::cout<<"   ( "<<x<<" ) "<<std::endl
+#define GAME_MSG_INFO_ENDL( x ) std::cout<<" --- "<<x<<" --- "<<std::endl
+#define GAME_MSG_INFO_NOENDL( x ) std::cout<<" --- "<<x<<" --- "
+#define GAME_MSG_SEP_LINE() std::cout<<"------------------------"<<std::endl
+#define GAME_MSG_SEP_ENDL() std::cout<<std::endl;
 
 #if 0
 

@@ -37,7 +37,7 @@ struct Card
 	}
 
 	void Print(){
-		std::cout<<num;
+		GAME_MSG_DEFAULT(num);
 	}
 };
 
@@ -88,9 +88,9 @@ struct OneShot
 		for( auto it = vec_card.begin(); it != vec_card.end(); ++it )
 		{
 			it->Print();
-			std::cout<<"  ";
+			GAME_MSG_DEFAULT("  ");
 		}
-		std::cout<<std::endl;
+		GAME_MSG_SEP_ENDL();
 	}
 	
 	bool Empty() const {
@@ -158,9 +158,9 @@ public:
 		for( auto it = m_vec_card.begin(); it != m_vec_card.end(); ++it )
 		{
 			it->Print();
-			std::cout<<"  ";
+			GAME_MSG_DEFAULT("  ");
 		}
-		std::cout<<std::endl;
+		GAME_MSG_SEP_ENDL();
 	}
 };
 

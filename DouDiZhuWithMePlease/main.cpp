@@ -2,6 +2,7 @@
 #include "game.h"
 #include <iostream>
 
+#include <Windows.h>
 #define ReleaseVersion
 
 int main()
@@ -43,6 +44,5 @@ int main()
 	}
 	game.PrintResult();
 
-	int a;
-	std::cin>>a;
+	std::getchar();
 }

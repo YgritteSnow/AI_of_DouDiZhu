@@ -513,12 +513,13 @@ bool GameState::CheckGameEnd()
 
 void GameState::Print()
 {
-	GAME_MSG_1("当前牌局");
-	std::cout<<( !isYgrittesPlaying ? "Ygritte" : "JonSnow" )<<"上回合出牌: ";
+	GAME_MSG_INFO_ENDL("当前牌局");
+	GAME_MSG_INFO_ENDL(( !isYgrittesPlaying ? "Ygritte" : "JonSnow" )<<"上回合出牌: ");
 	lastShot.Print();
-	std::cout<<"Ygritte当前: ";
+	GAME_MSG_INFO_ENDL("Ygritte当前: ");
 	Ygritte.Print();
-	std::cout<<"JonSnow当前: ";
+	GAME_MSG_INFO_ENDL("JonSnow当前: ");
 	JonSnow.Print();
-	std::cout<<"本回合该"<<( isYgrittesPlaying ? "Ygritte" : "JonSnow" )<<"出牌了"<<std::endl;
+	GAME_MSG_SEP_LINE();
+	GAME_MSG_INFO_ENDL("本回合该"<<( isYgrittesPlaying ? "Ygritte" : "JonSnow" )<<"出牌了");
 }
