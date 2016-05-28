@@ -20,7 +20,11 @@ void Game::NextMove()
 		m_last_shot = PlayerMove();
 	}
 	m_cur_game->Move( m_last_shot );
-	PrintCurrentState();
+	
+	if( !HasEnd() )
+	{
+		PrintCurrentState();
+	}
 }
 
 bool Game::HasEnd()
@@ -36,6 +40,10 @@ OneShot Game::AIMove()
 	{
 		m_ai_givein = true;
 	}
+	else
+	{
+		m_last_shot.Print();
+	}
 	return shot;
 }
 
@@ -45,6 +53,7 @@ OneShot Game::PlayerMove()
 	while( true )
 	{
 		GAME_MSG_INFO_ENDL("输入你要出的牌，0表示不出)。空格键隔开，回车键确认：");
+		GAME_MSG_SEP_TAB();
 		m_last_shot.vec_card.clear();
 
 		std::string playerStr;

@@ -85,10 +85,11 @@ struct OneShot
 	}
 
 	void Print(){
+		GAME_MSG_SEP_TAB();
 		for( auto it = vec_card.begin(); it != vec_card.end(); ++it )
 		{
 			it->Print();
-			GAME_MSG_DEFAULT("  ");
+			GAME_MSG_SEP_SPACE();
 		}
 		GAME_MSG_SEP_ENDL();
 	}
@@ -155,6 +156,7 @@ public:
 	}
 
 	void Print(){
+		GAME_MSG_SEP_TAB();
 		for( auto it = m_vec_card.begin(); it != m_vec_card.end(); ++it )
 		{
 			it->Print();

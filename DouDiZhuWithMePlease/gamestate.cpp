@@ -514,8 +514,11 @@ bool GameState::CheckGameEnd()
 void GameState::Print()
 {
 	GAME_MSG_INFO_ENDL("当前牌局");
-	GAME_MSG_INFO_ENDL(( !isYgrittesPlaying ? "Ygritte" : "JonSnow" )<<"上回合出牌: ");
-	lastShot.Print();
+	if( !lastShot.Empty() )
+	{
+		GAME_MSG_INFO_ENDL(( !isYgrittesPlaying ? "Ygritte" : "JonSnow" )<<"上回合出牌: ");
+		lastShot.Print();
+	}
 	GAME_MSG_INFO_ENDL("Ygritte当前: ");
 	Ygritte.Print();
 	GAME_MSG_INFO_ENDL("JonSnow当前: ");

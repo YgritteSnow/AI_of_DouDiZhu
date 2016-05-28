@@ -35,7 +35,7 @@ int main()
 		snow.push_back( Card( j[i], Card::SuitType_clubs ) );
 	}
 
-	Game game( ygritte, snow, true);
+	Game game( snow, ygritte, true);
 
 	game.Start();
 	while( !game.HasEnd() )
