@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "minmaxtree.h"
 #include <iostream>
+#include "quick_micros.h"
 
 struct Card
 {
@@ -16,6 +17,8 @@ struct Card
 		SuitType_hearts, 
 	};
 	Card(int n, SuitType s):num(n), suit(s){}
+	Card( const Card& c ):num(c.num), suit(c.suit){}
+
 	int num;
 	SuitType suit;
 
@@ -40,7 +43,19 @@ struct Card
 
 struct OneShot
 {
+	~OneShot(){
+		DEBUG_TRACE_FUNC("OneShot");}
+	OneShot():shottype(ShotType_null){};
+	OneShot( const OneShot& c ):shottype(c.shottype){
+		vec_card.clear();
+		for( auto it = c.vec_card.begin(); it != c.vec_card.end(); ++it )
+		{
+			vec_card.push_back( Card( it->num, it->suit ) );
+		}
+	}
+
 	enum ShotType {
+		ShotType_null,
 		ShotType_single, 
 		ShotType_double,
 		ShotType_three, 
@@ -49,6 +64,25 @@ struct OneShot
 		ShotType_twoKing, 
 	} shottype;
 	std::vector< Card > vec_card;
+
+	bool IsHigher( const OneShot s ) const {
+		if( s.Empty() )
+		{
+			return true;
+		}
+
+		if( Empty() )
+		{
+			return false;
+		}
+
+		if( shottype != s.shottype )
+		{
+			return false;
+		}
+
+		return vec_card[0].num > s.vec_card[0].num;
+	}
 
 	void Print(){
 		for( auto it = vec_card.begin(); it != vec_card.end(); ++it )
@@ -59,12 +93,18 @@ struct OneShot
 		std::cout<<std::endl;
 	}
 	
+	bool Empty() const {
+		return vec_card.empty();
+	}
+
 	bool CalSelfType();
 };
 
 class Player
 {
 public:
+	~Player(){
+		DEBUG_TRACE_FUNC("Player");}
 	std::vector< Card > m_vec_card;
 
 	std::vector< OneShot > GenerateShot_all_shift();
@@ -83,6 +123,18 @@ public:
 			}
 		}
 		return res;
+	}
+
+	const Player operator-=( OneShot shot ) {
+		for( auto it = shot.vec_card.begin(); it != shot.vec_card.end(); ++it )
+		{
+			auto find_it = std::find( m_vec_card.begin(), m_vec_card.end(), *it );
+			if( find_it != m_vec_card.end() )
+			{
+				m_vec_card.erase( find_it );
+			}
+		}
+		return *this;
 	}
 
 	bool isValidShot( OneShot shot ) const {
@@ -130,28 +182,28 @@ public:
 			JonSnow.m_vec_card.push_back( pGS2[i] );
 		}
 		isYgrittesPlaying = isp11Turn;
+		m_isNeedAllMax = !isYgrittesPlaying;
+		
 	}
+	virtual ~GameState(){
+		DEBUG_TRACE_FUNC("GameState");
+	}
+	bool ThinkForNextMove( OneShot& shot );
 	virtual void GenerateChildren();
 	virtual void Print();
-	OneShot DecideAndMove();
-
-	GameState* GetNewChild( OneShot shot, bool isYgrittesPlaying );
+	void Move( OneShot shot );
 	bool CheckGameEnd();
 
-	Player Ygritte;
+	bool isYgrittesPlaying;
 	Player JonSnow;
 	OneShot lastShot;
-	bool isYgrittesPlaying;
-};
 
-class GameStateTree : public DecidingTree< GameState >
-{
-public:
-	GameStateTree( std::vector<Card> pGS1, std::vector<Card> pGS2, bool isp11Turn )
-	{
-		m_root = new GameState( pGS1, pGS2, isp11Turn );
-	}
-	~GameStateTree(){};
+private:
+	void CheckChildMinMax();
+
+	GameState* GetNewChild( OneShot shot, bool isYgrittesPlaying );
+
+	Player Ygritte;
 };
 
 #endif 

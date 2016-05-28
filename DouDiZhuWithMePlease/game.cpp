@@ -4,20 +4,23 @@
 
 void Game::Start()
 {
-	std::cout<<" --- 游戏开始 ---"<<std::endl;
+	GAME_MSG_1("游戏开始");
 	m_ai_givein = false;
+	PrintCurrentState();
 }
 
 void Game::NextMove()
 {
 	if( m_cur_game->isYgrittesPlaying )
 	{
-		AIMove();
+		m_last_shot = AIMove();
 	}
 	else
 	{
-		PlayerMove();
+		m_last_shot = PlayerMove();
 	}
+	m_cur_game->Move( m_last_shot );
+	PrintCurrentState();
 }
 
 bool Game::HasEnd()
@@ -25,31 +28,23 @@ bool Game::HasEnd()
 	return m_ai_givein || m_cur_game->CheckGameEnd();
 }
 
-void Game::AIMove()
+OneShot Game::AIMove()
 {
-	std::cout<<" --- AI 思考中 --- "<<std::endl;
-	m_last_shot = m_cur_game->DecideAndMove();
-	if( m_last_shot.vec_card.empty() )
+	GAME_MSG_1("AI 思考中");
+	OneShot shot;
+	if( !m_cur_game->ThinkForNextMove( shot ) )
 	{
 		m_ai_givein = true;
-		std::cout<<" AI 没有必胜把握！投降了！"<<std::endl;
 	}
-	else
-	{
-		std::cout<<"AI 出牌："<<std::endl;
-		m_last_shot.Print();
-		std::cout<<"当前牌局："<<std::endl;
-		m_cur_game->Print();
-	}
-	std::cout<<" --- AI 完成 --- "<<std::endl;
+	return shot;
 }
 
-void Game::PlayerMove()
+OneShot Game::PlayerMove()
 {
-	std::cout<<" --- 玩家回合开始 --- "<<std::endl;
+	GAME_MSG_1("玩家选择出牌");
 	while( true )
 	{
-		std::cout<<"输入你要出的牌，空格键隔开，回车键确认："<<std::endl;
+		std::cout<<"输入你要出的牌，0表示不出)。空格键隔开，回车键确认："<<std::endl;
 		m_last_shot.vec_card.clear();
 
 		std::string playerStr;
@@ -59,36 +54,59 @@ void Game::PlayerMove()
 		int c;
 		while( strStream>> c )
 		{
+			if( c == 0 )
+			{
+				m_last_shot = OneShot();
+				return m_last_shot;
+			}
 			m_last_shot.vec_card.push_back( Card( c, Card::SuitType_clubs ) );
 		}
-		if( m_last_shot.CalSelfType() )
-		{
-			if( m_cur_game->JonSnow.isValidShot( m_last_shot ) )
-			{
-				break;
-			}
-		}
-	}
 
-	std::cout<<" --- 玩家回合结束 --- "<<std::endl;
+		if( !m_last_shot.CalSelfType() )
+		{
+			GAME_MSG_2("错误的组合！");
+		}
+		else if( !m_cur_game->JonSnow.isValidShot( m_last_shot ) )
+		{
+			GAME_MSG_2("没有这张牌！");
+		}
+		else if( !m_last_shot.IsHigher(m_cur_game->lastShot) )
+		{
+			GAME_MSG_2("不能压过对方！");
+		}
+		else
+		{
+			return m_last_shot;
+		}
+		std::cout<<"出牌错误，请重试"<<std::endl;
+	}
+	return OneShot();
+}
+
+void Game::PrintCurrentState()
+{
+	m_cur_game->Print();
 }
 
 void Game::PrintResult()
 {
-	std::cout<<" --- 游戏结束 --- "<<std::endl;
+	GAME_MSG_1("游戏结束");
+	
+	PrintCurrentState();
+
 	if( m_ai_givein )
 	{
-		std::cout<<"AI认输"<<std::endl;
+		GAME_MSG_1("AI认输");
 	}
 	else
 	{
 		if( m_cur_game->m_curIsMax )
 		{
-			std::cout<<"AI赢了"<<std::endl;
+			GAME_MSG_1("AI赢了");
 		}
 		else
 		{
-			std::cout<<"你赢了"<<std::endl;
+			GAME_MSG_1("你赢了");
 		}
 	}
 }

@@ -8,22 +8,28 @@
 
 #include <deque>
 #include <vector>
+#include <iostream>
+#include "quick_micros.h"
 
 // 最大最小树 - 节点
 class MinMaxTreeNodeBase
 {
 public:
-	MinMaxTreeNodeBase() :m_father(NULL) {};
+	MinMaxTreeNodeBase(){};
 	virtual ~MinMaxTreeNodeBase(){
-		for( auto it = m_vec_children.begin(); it != m_vec_children.end(); ++it ) { delete (*it); }
+		DEBUG_TRACE_FUNC("MinMaxTreeNodeBase");
+		DEBUG_LOG(m_vec_children.size());
+		for( auto it = m_vec_children.begin(); it != m_vec_children.end(); ++it ) {
+			delete (*it);
+			*it = NULL;
+		}
 		m_vec_children.clear();
+		DEBUG_TRACE_FUNC("MinMaxTreeNodeBase");
 	};
 
 	void AddChildren( MinMaxTreeNodeBase* p_children ){
 		m_vec_children.push_back( p_children );
-		p_children->SetFather( this );
 	}
-	void SetFather( MinMaxTreeNodeBase* p_father ){ m_father = p_father; }
 	std::vector< MinMaxTreeNodeBase* >::iterator FirstChild(){ return m_vec_children.begin(); }
 	std::vector< MinMaxTreeNodeBase* >::iterator LastChild(){ return m_vec_children.end(); }
 
@@ -37,7 +43,6 @@ public:
 
 protected:
 	std::vector< MinMaxTreeNodeBase* > m_vec_children;
-	MinMaxTreeNodeBase* m_father;
 
 };
 
@@ -48,7 +53,7 @@ class MinMaxTree
 public:
 	typedef TreeNode* TreeNodePtr;
 	MinMaxTree():m_root(NULL){}
-	virtual ~MinMaxTree(){
+	virtual ~MinMaxTree(){DEBUG_TRACE_FUNC("MinMaxTree");
 		delete m_root;
 		m_root = NULL;
 	}
@@ -66,7 +71,7 @@ class DecidingTree : public MinMaxTree< TreeNode >
 {
 public:
 	DecidingTree(){};
-	virtual ~DecidingTree(){};
+	virtual ~DecidingTree(){DEBUG_TRACE_FUNC("DecidingTree");}
 
 	void StartGenerate(){
 		m_root->GenerateChildren();

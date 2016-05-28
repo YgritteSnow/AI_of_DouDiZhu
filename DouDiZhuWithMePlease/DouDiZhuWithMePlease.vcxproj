@@ -68,6 +68,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="gamestate.h" />
     <ClInclude Include="minmaxtree.h" />
+    <ClInclude Include="quick_micros.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
