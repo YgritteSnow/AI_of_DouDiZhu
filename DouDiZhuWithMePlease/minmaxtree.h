@@ -1,5 +1,5 @@
-#ifndef __F__MYPROJECTS_DOUDIZHUWITHMEPLEASE__DOUDIZHUWITHMEPLEASE_MINMAXTREE_H__
-#define __F__MYPROJECTS_DOUDIZHUWITHMEPLEASE__DOUDIZHUWITHMEPLEASE_MINMAXTREE_H__
+#ifndef __DOUDIZHUWITHMEPLEASE_MINMAXTREE_H__
+#define __DOUDIZHUWITHMEPLEASE_MINMAXTREE_H__
 
 /************************************************************************/
 /* 只寻找可以得到决策的一种方法，其他情况剪枝不再处理                   */
